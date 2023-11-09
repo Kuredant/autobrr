@@ -33,16 +33,16 @@ func TestAppConfig_processLines(t *testing.T) {
 				m:      sync.Mutex{},
 			},
 			args: args{[]string{}},
-			want: []string{"# Check for updates", "#", "checkForUpdates = true", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""},
+			want: []string{"# Check for updates", "#", "checkForUpdates = true", "# Bot mode", "#", "enableBotMode = false", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""},
 		},
 		{
 			name: "update existing",
 			fields: fields{
-				Config: &domain.Config{CheckForUpdates: true, LogLevel: "TRACE"},
+				Config: &domain.Config{CheckForUpdates: true, EnableBotMode: true, LogLevel: "TRACE"},
 				m:      sync.Mutex{},
 			},
-			args: args{[]string{"# Check for updates", "#", "checkForUpdates = false", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""}},
-			want: []string{"# Check for updates", "#", "checkForUpdates = true", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""},
+			args: args{[]string{"# Check for updates", "#", "checkForUpdates = false", "# Bot mode", "#", "enableBotMode = false", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""}},
+			want: []string{"# Check for updates", "#", "checkForUpdates = true", "# Bot mode", "#", "enableBotMode = true", "# Log level", "#", "# Default: \"DEBUG\"", "#", "# Options: \"ERROR\", \"DEBUG\", \"INFO\", \"WARN\", \"TRACE\"", "#", `logLevel = "TRACE"`, "# Log Path", "#", "# Optional", "#", "#logPath = \"\""},
 		},
 	}
 	for _, tt := range tests {

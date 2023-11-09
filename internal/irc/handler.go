@@ -60,6 +60,7 @@ func (ch *channelHealth) resetMonitoring() {
 
 type Handler struct {
 	log                 zerolog.Logger
+	config              *domain.Config
 	sse                 *sse.Server
 	network             *domain.IrcNetwork
 	releaseSvc          release.Service
@@ -87,9 +88,10 @@ type Handler struct {
 	saslauthed    bool
 }
 
-func NewHandler(log zerolog.Logger, sse *sse.Server, network domain.IrcNetwork, definitions []*domain.IndexerDefinition, releaseSvc release.Service, notificationSvc notification.Service) *Handler {
+func NewHandler(log zerolog.Logger, config *domain.Config, sse *sse.Server, network domain.IrcNetwork, definitions []*domain.IndexerDefinition, releaseSvc release.Service, notificationSvc notification.Service) *Handler {
 	h := &Handler{
 		log:                 log.With().Str("network", network.Server).Logger(),
+		config:              config,
 		sse:                 sse,
 		client:              nil,
 		network:             &network,
@@ -199,7 +201,9 @@ func (h *Handler) Run() error {
 	h.client.AddDisconnectCallback(h.onDisconnect)
 
 	h.client.AddCallback("MODE", h.handleMode)
-	h.client.AddCallback("501", h.handleModeUnknownFlag)
+	if h.config.EnableBotMode {
+		h.client.AddCallback("501", h.handleModeUnknownFlag)
+	}
 	h.client.AddCallback("INVITE", h.handleInvite)
 	h.client.AddCallback("366", h.handleJoined)
 	h.client.AddCallback("PART", h.handlePart)
@@ -371,6 +375,11 @@ func (h *Handler) onConnect(m ircmsg.Message) {
 	}()
 
 	time.Sleep(1 * time.Second)
+
+	if !h.config.EnableBotMode {
+		h.authenticate()
+		return
+	}
 
 	// If we set Bot Mode, the authentication will happen after the mode response
 	if !h.setBotMode() {
@@ -876,7 +885,7 @@ func (h *Handler) handleMode(msg ircmsg.Message) {
 		return
 	}
 
-	if h.botMode != "" && h.isOurCurrentNick(msg.Params[0]) && strings.Contains(msg.Params[1], "+"+h.botMode) {
+	if h.config.EnableBotMode && h.botMode != "" && h.isOurCurrentNick(msg.Params[0]) && strings.Contains(msg.Params[1], "+"+h.botMode) {
 		h.authenticate()
 	}
 }

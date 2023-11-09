@@ -41,6 +41,7 @@ type Service interface {
 
 type service struct {
 	log zerolog.Logger
+	config *domain.Config
 	sse *sse.Server
 
 	repo                domain.IrcRepo
@@ -56,9 +57,10 @@ type service struct {
 
 const sseMaxEntries = 1000
 
-func NewService(log logger.Logger, sse *sse.Server, repo domain.IrcRepo, releaseSvc release.Service, indexerSvc indexer.Service, notificationSvc notification.Service) Service {
+func NewService(log logger.Logger, config *domain.Config, sse *sse.Server, repo domain.IrcRepo, releaseSvc release.Service, indexerSvc indexer.Service, notificationSvc notification.Service) Service {
 	return &service{
 		log:                 log.With().Str("module", "irc").Logger(),
+		config:              config,
 		sse:                 sse,
 		repo:                repo,
 		releaseService:      releaseSvc,
@@ -96,7 +98,7 @@ func (s *service) StartHandlers() {
 		network.Channels = channels
 
 		// init new irc handler
-		handler := NewHandler(s.log, s.sse, network, definitions, s.releaseService, s.notificationService)
+		handler := NewHandler(s.log, s.config, s.sse, network, definitions, s.releaseService, s.notificationService)
 
 		// use network.Server + nick to use multiple indexers with different nick per network
 		// this allows for multiple handlers to one network
@@ -153,7 +155,7 @@ func (s *service) startNetwork(network domain.IrcNetwork) error {
 		network.Channels = channels
 
 		// init new irc handler
-		handler := NewHandler(s.log, s.sse, network, definitions, s.releaseService, s.notificationService)
+		handler := NewHandler(s.log, s.config, s.sse, network, definitions, s.releaseService, s.notificationService)
 
 		s.handlers[network.ID] = handler
 		s.lock.Unlock()

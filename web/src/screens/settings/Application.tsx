@@ -113,6 +113,21 @@ function ApplicationSettings() {
     }
   });
 
+  const botModeMutation = useMutation({
+    mutationFn: APIClient.updates.check,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["botMode"] });
+    }
+  });
+
+  const toggleBotModeMutation = useMutation((value: boolean) => APIClient.config.update({ enable_bot_mode: value }).then(() => value), {
+    onSuccess: (value: boolean) => {
+      toast.custom(t => <Toast type="success" body={`${value ? "Bot mode is now enabled." : "Bot mode is now disabled."}`} t={t} />);
+      queryClient.invalidateQueries({ queryKey: ["config"] });
+      botModeMutation.mutate();
+    }
+  });
+
   return (
     <div className="divide-y divide-gray-200 dark:divide-gray-700 lg:col-span-9">
       <div className="py-6 px-4 sm:p-6 lg:pb-8">
@@ -203,6 +218,16 @@ function ApplicationSettings() {
               value={data?.check_for_updates ?? true}
               setValue={(newValue: boolean) => {
                 toggleCheckUpdateMutation.mutate(newValue);
+              }}
+            />
+          </div>
+          <div className="px-4 sm:px-6 py-1">
+            <Checkbox
+              label="Enable bot mode"
+              description="Enable IRCv3 Bot Mode on servers that support it (IRC reconnection necessary)"
+              value={data?.enable_bot_mode ?? false}
+              setValue={(newValue: boolean) => {
+                toggleBotModeMutation.mutate(newValue);
               }}
             />
           </div>

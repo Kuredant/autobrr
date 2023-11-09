@@ -57,6 +57,12 @@ logLevel = "TRACE"
 #
 checkForUpdates = true
 
+# Bot mode
+#
+# Default: false
+#
+enableBotMode = false
+
 # Session secret
 #
 sessionSecret = "secret-session-key"

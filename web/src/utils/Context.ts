@@ -14,6 +14,7 @@ interface AuthInfo {
 interface SettingsType {
   debug: boolean;
   checkForUpdates: boolean;
+  enableBotMode: boolean;
   darkTheme: boolean;
   scrollOnNewLog: boolean;
   indentLogLines: boolean;
@@ -35,6 +36,7 @@ const AuthContextDefaults: AuthInfo = {
 const SettingsContextDefaults: SettingsType = {
   debug: false,
   checkForUpdates: true,
+  enableBotMode: false,
   darkTheme: true,
   scrollOnNewLog: false,
   indentLogLines: false,

@@ -17,6 +17,7 @@ interface Config {
   log_max_backups: number;
   base_url: string;
   check_for_updates: boolean;
+  enable_bot_mode: boolean;
   version: string;
   commit: string;
   date: string;
@@ -29,6 +30,7 @@ interface ConfigUpdate {
   log_path?: string;
   base_url?: string;
   check_for_updates?: boolean;
+  enable_bot_mode?: boolean;
 }
 
 interface LogFile {

@@ -16,6 +16,7 @@ type Config struct {
 	SessionSecret       string `toml:"sessionSecret"`
 	CustomDefinitions   string `toml:"customDefinitions"`
 	CheckForUpdates     bool   `toml:"checkForUpdates"`
+	EnableBotMode       bool   `toml:"enableBotMode"`
 	DatabaseType        string `toml:"databaseType"`
 	PostgresHost        string `toml:"postgresHost"`
 	PostgresPort        int    `toml:"postgresPort"`
@@ -33,4 +34,5 @@ type ConfigUpdate struct {
 	LogPath         *string `json:"log_path,omitempty"`
 	BaseURL         *string `json:"base_url,omitempty"`
 	CheckForUpdates *bool   `json:"check_for_updates,omitempty"`
+	EnableBotMode   *bool   `json:"enable_bot_mode,omitempty"`
 }

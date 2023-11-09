@@ -81,6 +81,10 @@ logLevel = "DEBUG"
 #
 checkForUpdates = true
 
+# Bot mode
+#
+enableBotMode = false
+
 # Session secret
 #
 sessionSecret = "{{ .sessionSecret }}"
@@ -193,6 +197,7 @@ func (c *AppConfig) defaults() {
 		SessionSecret:       api.GenerateSecureToken(16),
 		CustomDefinitions:   "",
 		CheckForUpdates:     true,
+		EnableBotMode:       false,
 		DatabaseType:        "sqlite",
 		PostgresHost:        "",
 		PostgresPort:        0,
@@ -270,6 +275,9 @@ func (c *AppConfig) DynamicReload(log logger.Logger) {
 		checkUpdates := viper.GetBool("checkForUpdates")
 		c.Config.CheckForUpdates = checkUpdates
 
+		botMode := viper.GetBool("enableBotMode")
+		c.Config.EnableBotMode = botMode
+
 		log.Debug().Msg("config file reloaded!")
 
 		c.m.Unlock()
@@ -302,6 +310,7 @@ func (c *AppConfig) processLines(lines []string) []string {
 	// keep track of not found values to append at bottom
 	var (
 		foundLineUpdate   = false
+		foundLineBotMode  = false
 		foundLineLogLevel = false
 		foundLineLogPath  = false
 	)
@@ -311,6 +320,11 @@ func (c *AppConfig) processLines(lines []string) []string {
 		if !foundLineUpdate && strings.Contains(line, "checkForUpdates =") {
 			lines[i] = fmt.Sprintf("checkForUpdates = %t", c.Config.CheckForUpdates)
 			foundLineUpdate = true
+		}
+		// set enableBotMode
+		if !foundLineBotMode && strings.Contains(line, "enableBotMode =") {
+			lines[i] = fmt.Sprintf("enableBotMode = %t", c.Config.EnableBotMode)
+			foundLineBotMode = true
 		}
 		if !foundLineLogLevel && strings.Contains(line, "logLevel =") {
 			lines[i] = fmt.Sprintf(`logLevel = "%s"`, c.Config.LogLevel)
@@ -337,6 +351,12 @@ func (c *AppConfig) processLines(lines []string) []string {
 		lines = append(lines, "# Check for updates")
 		lines = append(lines, "#")
 		lines = append(lines, fmt.Sprintf("checkForUpdates = %t", c.Config.CheckForUpdates))
+	}
+
+	if !foundLineBotMode {
+		lines = append(lines, "# Bot mode")
+		lines = append(lines, "#")
+		lines = append(lines, fmt.Sprintf("enableBotMode = %t", c.Config.EnableBotMode))
 	}
 
 	if !foundLineLogLevel {

@@ -28,6 +28,7 @@ type configJson struct {
 	LogMaxBackups   int    `json:"log_max_backups"`
 	BaseURL         string `json:"base_url"`
 	CheckForUpdates bool   `json:"check_for_updates"`
+	EnableBotMode   bool   `json:"enable_bot_mode"`
 	Version         string `json:"version"`
 	Commit          string `json:"commit"`
 	Date            string `json:"date"`
@@ -65,6 +66,7 @@ func (h configHandler) getConfig(w http.ResponseWriter, r *http.Request) {
 		BaseURL:         h.cfg.Config.BaseURL,
 		Database:        h.cfg.Config.DatabaseType,
 		CheckForUpdates: h.cfg.Config.CheckForUpdates,
+		EnableBotMode:   h.cfg.Config.EnableBotMode,
 		Version:         h.server.version,
 		Commit:          h.server.commit,
 		Date:            h.server.date,
@@ -99,6 +101,10 @@ func (h configHandler) updateConfig(w http.ResponseWriter, r *http.Request) {
 
 	if data.CheckForUpdates != nil {
 		h.cfg.Config.CheckForUpdates = *data.CheckForUpdates
+	}
+
+	if data.EnableBotMode != nil {
+		h.cfg.Config.EnableBotMode = *data.EnableBotMode
 	}
 
 	if data.LogLevel != nil {
